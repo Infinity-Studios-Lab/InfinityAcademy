@@ -1,13 +1,30 @@
+import { createClient } from '@/utils/supabase/server';
 import './globals.css';
 import Image from 'next/image';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
+import LoginPage from './login/page';
 
 export const metadata = {
   title: 'Infinity Academy Panel',
   description: 'Tutor/Parent/Student panel',
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+
+  const supabase = await createClient();
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return (
+      <html lang="en" data-theme="business">
+        <body className="min-h-screen">
+          <LoginPage />
+        </body>
+      </html>
+    );
+  }
+
   return (
     <html lang="en" data-theme="business">
       <body className="min-h-screen">
