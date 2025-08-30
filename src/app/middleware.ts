@@ -1,8 +1,9 @@
-import { type NextRequest } from 'next/server'
-import { updateSession } from '@/utils/supabase/middleware'
+import { type NextRequest, NextResponse } from 'next/server'
 
+// Temporarily disable middleware to debug redirect loop
 export async function middleware(request: NextRequest) {
-  return await updateSession(request)
+  // Just pass through for now
+  return NextResponse.next()
 }
 
 export const config = {

@@ -1,15 +1,10 @@
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
-import { login } from "./actions";
+import { signup } from "../login/actions";
 import Link from "next/link";
 
-export default async function LoginPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ message?: string }>;
-}) {
+export default async function SignupPage() {
   const supabase = await createClient();
-  const { message } = await searchParams;
 
   const {
     data: { user },
@@ -24,29 +19,12 @@ export default async function LoginPage({
     <div className="min-h-screen flex flex-col items-center justify-center bg-base-200">
       <div className="card w-96 bg-base-100 shadow-xl">
         <div className="card-body">
-          <h2 className="card-title text-2xl mb-6 text-center">Welcome Back</h2>
+          <h2 className="card-title text-2xl mb-6 text-center">
+            Create Account
+          </h2>
           <p className="text-center text-base-content/70 mb-6">
-            Sign in to your Infinity Academy account
+            Join Infinity Academy and start your learning journey
           </p>
-
-          {message && (
-            <div className="alert alert-info mb-4">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                className="stroke-current shrink-0 w-6 h-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                ></path>
-              </svg>
-              <span>{message}</span>
-            </div>
-          )}
 
           <form className="flex flex-col gap-4">
             <div className="form-control">
@@ -72,12 +50,12 @@ export default async function LoginPage({
                 name="password"
                 type="password"
                 required
-                placeholder="Enter your password"
+                placeholder="Create a password"
               />
             </div>
             <div className="form-control mt-6">
-              <button className="btn btn-primary" formAction={login}>
-                Sign In
+              <button className="btn btn-primary" formAction={signup}>
+                Create Account
               </button>
             </div>
           </form>
@@ -86,9 +64,9 @@ export default async function LoginPage({
 
           <div className="text-center">
             <p className="text-sm text-base-content/70">
-              Don't have an account?{" "}
-              <Link href="/signup" className="link link-primary">
-                Create one here
+              Already have an account?{" "}
+              <Link href="/login" className="link link-primary">
+                Sign in here
               </Link>
             </p>
           </div>

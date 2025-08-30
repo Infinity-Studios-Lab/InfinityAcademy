@@ -1,46 +1,61 @@
-'use server'
+"use server";
 
-import { revalidatePath } from 'next/cache'
-import { redirect } from 'next/navigation'
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
-import { createClient } from '@/utils/supabase/server'
+import { createClient } from "@/utils/supabase/server";
 
 export async function login(formData: FormData) {
-  const supabase = await createClient()
+  const supabase = await createClient();
 
   // type-casting here for convenience
   // in practice, you should validate your inputs
   const data = {
-    email: formData.get('email') as string,
-    password: formData.get('password') as string,
-  }
+    email: formData.get("email") as string,
+    password: formData.get("password") as string,
+  };
 
-  const { error } = await supabase.auth.signInWithPassword(data)
+  console.log(`[Login Action] Attempting login for email: ${data.email}`);
+
+  const { data: authData, error } = await supabase.auth.signInWithPassword(
+    data
+  );
 
   if (error) {
-    redirect('/error')
+    console.error(`[Login Action] Login error:`, error);
+    redirect("/error");
   }
 
-  revalidatePath('/', 'layout')
-  redirect('/')
+  console.log(
+    `[Login Action] Login successful for user:`,
+    authData.user?.email
+  );
+  console.log(
+    `[Login Action] Session:`,
+    authData.session ? "valid" : "invalid"
+  );
+
+  revalidatePath("/", "layout");
+  redirect("/student");
 }
 
 export async function signup(formData: FormData) {
-  const supabase = await createClient()
+  const supabase = await createClient();
 
   // type-casting here for convenience
   // in practice, you should validate your inputs
   const data = {
-    email: formData.get('email') as string,
-    password: formData.get('password') as string,
-  }
+    email: formData.get("email") as string,
+    password: formData.get("password") as string,
+  };
 
-  const { error } = await supabase.auth.signUp(data)
+  const { error } = await supabase.auth.signUp(data);
 
   if (error) {
-    redirect('/error')
+    redirect("/error");
   }
 
-  revalidatePath('/', 'layout')
-  redirect('/')
+  // After signup, redirect to login page
+  revalidatePath("/", "layout");
+  redirect("/login?message=Please check your email to confirm your account");
 }
