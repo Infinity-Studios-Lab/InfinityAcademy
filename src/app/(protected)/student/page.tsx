@@ -9,12 +9,19 @@ export default async function StudentHome() {
     <div className="text-sm">
       Welcome to the student dashboard.
       <div className="text-sm">
-        <ul>
-          {todos?.map((todo, index) => (
-            <li key={todo.id || index}>{todo.name || todo}</li>
-          ))}
-        </ul>
+        <div className = "card bg-base-100 shadow">
+          <div className="card-body">
+            
+          </div>
+        </div>
       </div>
     </div>
   );
 }
+
+/*
+        <ul>
+          {todos?.map((todo, index) => (
+            <li key={todo.id || index}>{todo.name || todo}</li>
+          ))}
+        </ul>*/
