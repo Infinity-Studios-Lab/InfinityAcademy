@@ -36,13 +36,49 @@ export async function updateSession(request: NextRequest) {
 
   try {
     // Refresh session if expired - required for Server Components
-    const { data: { user }, error } = await supabase.auth.getUser();
+    let user = null;
+    let error = null;
 
-    if (error) {
-      console.error("Auth error:", error);
+    try {
+      const result = await supabase.auth.getUser();
+      user = result.data.user;
+      error = result.error;
+    } catch (authError) {
+      // Handle any thrown errors from getUser()
+      if (
+        authError instanceof Error &&
+        (authError.message?.includes("refresh_token_not_found") ||
+          authError.message?.includes("Invalid Refresh Token"))
+      ) {
+        console.log("No valid session found, user not authenticated");
+        user = null;
+        error = null;
+      } else {
+        console.error("Auth error:", authError);
+        user = null;
+        error = authError;
+      }
     }
 
-    console.log(`[Middleware] Path: ${request.nextUrl.pathname}, User: ${user ? 'authenticated' : 'not authenticated'}`);
+    if (error) {
+      // Handle refresh token errors gracefully
+      if (
+        error instanceof Error &&
+        (error.message?.includes("refresh_token_not_found") ||
+          error.message?.includes("Invalid Refresh Token"))
+      ) {
+        console.log("No valid session found, user not authenticated");
+        user = null;
+      } else {
+        console.error("Auth error:", error);
+      }
+    }
+
+    console.log(
+      `[Middleware] Path: ${request.nextUrl.pathname}, User: ${
+        user ? "authenticated" : "not authenticated"
+      }`
+    );
 
     // Define public paths that don't require authentication
     const publicPaths = [
@@ -66,11 +102,15 @@ export async function updateSession(request: NextRequest) {
       request.nextUrl.pathname.startsWith("/admin") ||
       request.nextUrl.pathname.startsWith("/private");
 
-    console.log(`[Middleware] isProtectedPath: ${isProtectedPath}, isPublicPath: ${isPublicPath}`);
+    console.log(
+      `[Middleware] isProtectedPath: ${isProtectedPath}, isPublicPath: ${isPublicPath}`
+    );
 
     if (!user && isProtectedPath) {
       // no user trying to access protected route, redirect to login page
-      console.log(`[Middleware] Redirecting unauthenticated user from ${request.nextUrl.pathname} to /login`);
+      console.log(
+        `[Middleware] Redirecting unauthenticated user from ${request.nextUrl.pathname} to /login`
+      );
       const url = request.nextUrl.clone();
       url.pathname = "/login";
       url.searchParams.set("message", "Please login to access this page");
@@ -83,7 +123,9 @@ export async function updateSession(request: NextRequest) {
         request.nextUrl.pathname === "/signup")
     ) {
       // user is logged in but trying to access login/signup pages, redirect to home
-      console.log(`[Middleware] Redirecting authenticated user from ${request.nextUrl.pathname} to /`);
+      console.log(
+        `[Middleware] Redirecting authenticated user from ${request.nextUrl.pathname} to /`
+      );
       const url = request.nextUrl.clone();
       url.pathname = "/";
       return NextResponse.redirect(url);

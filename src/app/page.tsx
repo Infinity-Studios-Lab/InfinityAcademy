@@ -5,13 +5,18 @@ import Link from "next/link";
 export default async function PublicHome() {
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  try {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  // If user is logged in, redirect to student dashboard
-  if (user) {
-    redirect("/student");
+    // If user is logged in, redirect to student dashboard
+    if (user) {
+      redirect("/student");
+    }
+  } catch (error) {
+    // Handle authentication errors gracefully
+    console.log("Authentication check failed, showing public home");
   }
 
   return (
