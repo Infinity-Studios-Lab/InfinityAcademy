@@ -1,3 +1,4 @@
+import CalendarCard from "@/components/calendarCard";
 import { createClient } from "../../../utils/supabase/server";
 import { jwtDecode } from "jwt-decode";
 
@@ -21,7 +22,9 @@ export default async function StudentHome() {
       Welcome to the student dashboard.
       <div className="text-sm">
         <div className="card bg-base-100 shadow">
-          <div className="card-body"></div>
+          <div className="card-body">
+            <CalendarCard date={"12/12/2025"} time={"12:15"} event={"Coding Lesson"} name={"Avar"}></CalendarCard>
+          </div>
         </div>
       </div>
     </div>
