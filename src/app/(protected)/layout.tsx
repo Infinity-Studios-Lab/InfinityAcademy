@@ -2,36 +2,20 @@ import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import redirectUser from "@/utils/roles/redirectUser";
 
 export default async function ProtectedLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = await createClient();
 
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
-
-  console.log(
-    `[Protected Layout] User: ${user ? user.email : "not authenticated"}`
-  );
-  console.log(`[Protected Layout] Auth error: ${error || "none"}`);
-
-  // If no user, redirect to login page
-  if (!user) {
-    console.log(`[Protected Layout] Redirecting to login`);
-    redirect("/login?message=Please login to access this page");
-  }
-
-  console.log(`[Protected Layout] User authenticated, showing dashboard`);
+  console.log("Protected Layout");
 
   return (
     <div className="drawer lg:drawer-open">
       <input id="app-drawer" type="checkbox" className="drawer-toggle" />
-      <div className="drawer-content flex flex-col">
+      <div className="drawer-content flex flex-col min-h-screen">
         <div className="navbar bg-base-100 border-b">
           <div className="flex-none lg:hidden">
             <label htmlFor="app-drawer" className="btn btn-ghost btn-square">

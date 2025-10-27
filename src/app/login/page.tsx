@@ -2,23 +2,14 @@ import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import { login } from "./actions";
 import Link from "next/link";
+import redirectUser from "@/utils/roles/redirectUser";
 
 export default async function LoginPage({
   searchParams,
 }: {
   searchParams: Promise<{ message?: string }>;
 }) {
-  const supabase = await createClient();
   const { message } = await searchParams;
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  // If user is logged in, redirect to student dashboard
-  if (user) {
-    redirect("/student");
-  }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-base-200">

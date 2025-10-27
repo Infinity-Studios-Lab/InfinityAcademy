@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { createClient } from "@/utils/supabase/server";
+import redirectUser from "@/utils/roles/redirectUser";
 
 export async function login(formData: FormData) {
   const supabase = await createClient();
@@ -36,7 +37,7 @@ export async function login(formData: FormData) {
   );
 
   revalidatePath("/", "layout");
-  redirect("/student");
+  await redirectUser([]);
 }
 
 export async function signup(formData: FormData) {

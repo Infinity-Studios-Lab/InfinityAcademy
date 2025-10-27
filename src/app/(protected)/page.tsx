@@ -1,6 +1,6 @@
+import redirectUser from "@/utils/roles/redirectUser";
 import { redirect } from "next/navigation";
 
-export default function ProtectedHome() {
-  // Redirect to student dashboard
-  redirect("/student");
+export default async function ProtectedHome() {
+  await redirectUser([]);
 }

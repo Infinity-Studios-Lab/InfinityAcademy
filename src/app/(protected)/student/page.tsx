@@ -1,21 +1,10 @@
+import redirectUser from "@/utils/roles/redirectUser";
 import { createClient } from "../../../utils/supabase/server";
 import { jwtDecode } from "jwt-decode";
 
 export default async function StudentHome() {
-  const supabase = await createClient();
-
-  const { data: todos } = await supabase.from("todos").select();
-
-  supabase.auth.onAuthStateChange(async (event, session) => {
-    if (session) {
-      const jwt = jwtDecode(session.access_token) as any;
-      const userRole = jwt.user_role;
-
-      console.log(jwt);
-      console.log("userRole", userRole);
-    }
-  });
-
+  await redirectUser(["student"]);
+  
   return (
     <div className="text-sm">
       Welcome to the student dashboard.
