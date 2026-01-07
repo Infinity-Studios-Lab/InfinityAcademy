@@ -2,15 +2,46 @@ import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import redirectUser from "@/utils/roles/redirectUser";
 
 export default async function ProtectedLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
-  console.log("Protected Layout");
+  if (!user) {
+    redirect("/login?message=Please login to access this page");
+  }
+
+  // Verify user record exists, create if missing
+  const { data: userRecord, error } = await supabase
+    .from("users")
+    .select("id, role")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (error) {
+    console.error("Error checking user record:", error);
+  }
+
+  if (!userRecord && !error) {
+    // User record doesn't exist, try to create it
+    const role = user.user_metadata?.role || user.raw_user_meta_data?.role || 'student';
+    const { error: insertError } = await supabase
+      .from("users")
+      .insert([{
+        id: user.id,
+        email: user.email!,
+        role: role,
+        profile_data: {},
+      }]);
+
+    if (insertError) {
+      console.error("Error creating user record in layout:", insertError);
+    }
+  }
 
   return (
     <div className="drawer lg:drawer-open">

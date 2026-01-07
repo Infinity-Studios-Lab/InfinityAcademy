@@ -2,42 +2,35 @@
 import Reviews from '@/components/Reviews';
 import AverageRating from "@/components/AverageRating";
 import redirectUser from "@/utils/roles/redirectUser";
+import { createClient } from "@/utils/supabase/server";
 
 export default async function ParentHome() {
   await redirectUser(["parent"]);
 
-  const testReviews = [
-    {
-      teachername: "Dr. Sarah Johnson",
-      subject: "Mathematics",
-      rating: 4.5,
-      description: "Excellent teacher wi ing methods. Makes complex topics easy to understand hjbdshfegfjsdhjdsghjf fdshgfh hfdshfdbhgfdh fhgfdh hgdfhs hgfd hgjfs dfhgdsfsu9ndfioaf jisakjfdhuafnibhcadgfds jashfgufhidufnsaugfuoagfyehfbf jdfbdhfaugfyd ing methods. Makes complex topics easy to understand hjbdshfegfjsdhjdsghjf fdshgfh hfdshfdbhgfdh fhgfdh hgdfhs hgfd hgjfs dfhgdsfsu9ndfioaf jisakjfdhuafnibhcadgfds jashfgufhidufnsaugfuoagfyehfbf jdfbdhfaugfyd ing methods. Makes complex topics easy to understand hjbdshfegfjsdhjdsghjf fdshgfh hfdshfdbhgfdh fhgfdh hgdfhs hgfd hgjfs dfhgdsfsu9ndfioaf jisakjfdhuafnibhcadgfds jashfgufhidufnsaugfuoagfyehfbf jdfbdhfaugfyd th great teaching metho ing methods. Makes complex topics easy to understand hjbdshfegfjsdhjdsghjf fdshgfh hfdshfdbhgfdh fhgfdh hgdfhs hgfd hgjfs dfhgdsfsu9ndfioaf jisakjfdhuafnibhcadgfds jashfgufhidufnsaugfuoagfyehfbf jdfbdhfaugfyd ing methods. Makes complex topics easy to understand hjbdshfegfjsdhjdsghjf fdshgfh hfdshfdbhgfdh fhgfdh hgdfhs hgfd hgjfs dfhgdsfsu9ndfioaf jisakjfdhuafnibhcadgfds jashfgufhidufnsaugfuoagfyehfbf jdfbdhfaugfyd ds. Makes complex topics easy to understand hjbdshfegfjsdhjdsghjf fdshgfh hfdshfdbhgfdh fhgfdh hgdfhs hgfd hgjfs dfhgdsfsu9ndfioaf jisakjfdhuafnibhcadgfds jashfgufhidufnsaugfuoagfyehfbf jdfbdhfaugfyd ."
-    },
-    {
-      teachername: "Prof. Michael Chen",
-      subject: "Physics",
-      rating: 3.5,
-      description: "Good professor with clear explanations and helpful office hours."
-    },
-    {
-      teachername: "Ms. Emily Davis",
-      subject: "English Literature",
-      rating: 5,
-      description: "Amazing teacher who makes literature come alive. Very engaging classes."
-    },
-    {
-      teachername: "Mr. David Wilson",
-      subject: "Chemistry",
-      rating: 4,
-      description: "Knowledgeable teacher with great lab demonstrations and practical examples."
-    },
-    {
-      teachername: "Dr. Lisa Brown",
-      subject: "Biology",
-      rating: 4.5,
-      description: "Passionate about the subject and very supportive of students' learning journeys."
-    }
-  ];
+  const supabase = await createClient();
+  
+  // Fetch reviews from database (if reviews table exists)
+  let formattedReviews: Array<{
+    teachername: string;
+    subject: string;
+    rating: number;
+    description: string;
+  }> = [];
+
+  const { data: reviews, error } = await supabase
+    .from('reviews')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (!error && reviews) {
+    // Format reviews to match the expected structure
+    formattedReviews = reviews.map((review: any) => ({
+      teachername: review.teacher_name || review.tutor_name || "Unknown Teacher",
+      subject: review.subject || "Unknown Subject",
+      rating: review.rating || 0,
+      description: review.description || review.comment || "",
+    }));
+  }
 
   return (
     <div>
@@ -46,7 +39,11 @@ export default async function ParentHome() {
         <AverageRating totalStars={50} maxStars={100} />
         <div className="p-8">
           <h1 className="text-2xl font-bold mb-4">Teacher Reviews</h1>
-          <Reviews reviews={testReviews} />
+          {formattedReviews.length === 0 ? (
+            <p className="text-base-content/70">No reviews available yet.</p>
+          ) : (
+            <Reviews reviews={formattedReviews} />
+          )}
         </div>
       </div>
     </div>

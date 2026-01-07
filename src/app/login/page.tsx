@@ -7,9 +7,9 @@ import redirectUser from "@/utils/roles/redirectUser";
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ message?: string }>;
+  searchParams: Promise<{ message?: string; error?: string }>;
 }) {
-  const { message } = await searchParams;
+  const { message, error: errorMessage } = await searchParams;
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-base-200">
@@ -19,6 +19,25 @@ export default async function LoginPage({
           <p className="text-center text-base-content/70 mb-6">
             Sign in to your Infinity Academy account
           </p>
+
+          {errorMessage && (
+            <div className="alert alert-error mb-4">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="stroke-current shrink-0 h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <span>{errorMessage}</span>
+            </div>
+          )}
 
           {message && (
             <div className="alert alert-info mb-4">
@@ -63,8 +82,17 @@ export default async function LoginPage({
                 name="password"
                 type="password"
                 required
+                minLength={6}
                 placeholder="Enter your password"
+                aria-describedby="password-help"
               />
+              <label className="label">
+                <span className="label-text-alt">
+                  <Link href="#" className="link link-hover">
+                    Forgot password?
+                  </Link>
+                </span>
+              </label>
             </div>
             <div className="form-control mt-6">
               <button className="btn btn-primary" formAction={login}>

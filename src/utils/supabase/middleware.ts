@@ -85,6 +85,7 @@ export async function updateSession(request: NextRequest) {
       "/login",
       "/signup",
       "/auth",
+      "/auth/confirm",
       "/error",
       "/favicon.ico",
     ];
@@ -94,18 +95,22 @@ export async function updateSession(request: NextRequest) {
     );
 
     // Check if the path is in the protected route group (including home page)
+    // All routes under (protected) are protected
     const isProtectedPath =
       request.nextUrl.pathname === "/" ||
       request.nextUrl.pathname.startsWith("/student") ||
       request.nextUrl.pathname.startsWith("/tutor") ||
       request.nextUrl.pathname.startsWith("/parent") ||
       request.nextUrl.pathname.startsWith("/admin") ||
-      request.nextUrl.pathname.startsWith("/private");
+      request.nextUrl.pathname.startsWith("/private") ||
+      request.nextUrl.pathname.startsWith("/api/email") ||
+      request.nextUrl.pathname.startsWith("/dashboard");
 
     console.log(
       `[Middleware] isProtectedPath: ${isProtectedPath}, isPublicPath: ${isPublicPath}`
     );
 
+    // If no user and trying to access protected path, redirect to login
     if (!user && isProtectedPath) {
       // no user trying to access protected route, redirect to login page
       console.log(
